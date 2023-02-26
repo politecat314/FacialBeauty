@@ -2,24 +2,50 @@ import numpy as np
 import cv2
 from coordinates import Point, Line
 
-def grid_4(image, results):
-    annotated_image = image.copy()
-
+def get_coordinates(shape, results):
+    """
+    get coordinates of the facial keypoints
+    """
     face = results.multi_face_landmarks[0]
-    shape = image.shape
 
     coordinates = []
     for landmark in face.landmark:
         x = landmark.x
         y = landmark.y
 
+        # convert relative coordinates into acutal image size
         relative_x = int(x * shape[1])
         relative_y = int(y * shape[0])
 
         coordinates.append([relative_x, relative_y])
 
-    cooridnates = np.array(coordinates)
-    
+    return coordinates
+
+
+def plot_keypoints(image, results, label_red=None):
+    """
+    Plot an image of the facial keypoints in blue.
+
+    label_red is a list of indexes in canonical_face_model_uv_visualization.png
+    """
+
+    annotated_image = image.copy()
+    coordinates = get_coordinates(image.shape, results)
+
+    for point in coordinates:
+        cv2.circle(annotated_image, point, radius=1, color=(255, 0, 100), thickness=2)
+
+    if label_red:
+        for index in label_red:
+            cv2.circle(annotated_image, coordinates[index], radius=1, color=(0, 0, 255), thickness=3)
+
+    return  annotated_image
+
+
+def grid_4(image, results):
+    annotated_image = image.copy()
+    coordinates = get_coordinates(image.shape, results)
+
     bottom_nose = Point.np_array_to_Point( coordinates[2] )
     
     lip_left_edge = Point.np_array_to_Point( coordinates[61] )
@@ -92,21 +118,7 @@ def grid_4(image, results):
 
 def grid_11(image, results):
     annotated_image = image.copy()
-
-    face = results.multi_face_landmarks[0]
-    shape = image.shape
-
-    coordinates = []
-    for landmark in face.landmark:
-        x = landmark.x
-        y = landmark.y
-
-        relative_x = int(x * shape[1])
-        relative_y = int(y * shape[0])
-
-        coordinates.append([relative_x, relative_y])
-
-    cooridnates = np.array(coordinates)
+    coordinates = get_coordinates(image.shape, results)
     
     
     
@@ -183,21 +195,7 @@ def grid_11(image, results):
 
 def grid_15(image, results):
     annotated_image = image.copy()
-
-    face = results.multi_face_landmarks[0]
-    shape = image.shape
-
-    coordinates = []
-    for landmark in face.landmark:
-        x = landmark.x
-        y = landmark.y
-
-        relative_x = int(x * shape[1])
-        relative_y = int(y * shape[0])
-
-        coordinates.append([relative_x, relative_y])
-
-    cooridnates = np.array(coordinates)
+    coordinates = get_coordinates(image.shape, results)
     
     
     
